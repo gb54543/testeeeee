@@ -1,790 +1,780 @@
-from pathlib import Path
-
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wave Tweaks - Otimização de Computador</title>
+  <title>Wave Tweaks</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#05070b;
-      --bg2:#0a1018;
-      --card:#0d141d;
-      --card2:#111b27;
-      --line:rgba(255,255,255,.08);
-      --text:#f6f8fb;
-      --muted:#9fb0c3;
-      --primary:#56a6ff;
-      --primary-2:#7fd0ff;
-      --shadow:0 18px 60px rgba(0,0,0,.35);
-      --radius:22px;
-      --max:1180px;
+    :root {
+      --bg: #020407;
+      --bg2: #071222;
+      --panel: #0c1321;
+      --panel2: #111a2d;
+      --line: rgba(255,255,255,.08);
+      --text: #f4f6fb;
+      --muted: rgba(255,255,255,.78);
+      --muted2: rgba(255,255,255,.58);
+      --blue: #2f7cf6;
+      --purple: #8b2df1;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 24px;
+      --container: 1240px;
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:'Inter',sans-serif;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #02060d;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
       background:
-        radial-gradient(circle at top, rgba(86,166,255,.16), transparent 35%),
-        radial-gradient(circle at 80% 10%, rgba(127,208,255,.1), transparent 25%),
-        linear-gradient(180deg, #03060a 0%, #070b11 45%, #04070c 100%);
-      color:var(--text);
-      overflow-x:hidden;
+        radial-gradient(circle at 50% 0%, rgba(40, 90, 180, .10), transparent 35%),
+        linear-gradient(180deg, #02060d 0%, #040912 40%, #07101c 100%);
+      z-index: -3;
     }
 
-    a{text-decoration:none;color:inherit}
-    img{max-width:100%;display:block}
-    .container{width:min(calc(100% - 32px), var(--max));margin:0 auto}
-
-    .grid-glow{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.35;
-      background-image:
-        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-      background-size:40px 40px;
-      mask-image:linear-gradient(to bottom, rgba(0,0,0,.8), transparent 85%);
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .45;
+      background-image: repeating-linear-gradient(
+        120deg,
+        rgba(255,255,255,.045) 0px,
+        rgba(255,255,255,.045) 1px,
+        transparent 1px,
+        transparent 10px
+      );
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.95), rgba(0,0,0,.8));
+      z-index: -2;
     }
 
-    header{
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter:blur(16px);
-      background:rgba(4,7,12,.62);
-      border-bottom:1px solid rgba(255,255,255,.06);
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container { width: min(calc(100% - 40px), var(--container)); margin: 0 auto; }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      opacity: .58;
     }
 
-    .nav{
-      min-height:78px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px;
+    .hero-bg svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:800;
-      letter-spacing:.2px;
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,.04);
     }
 
-    .brand-mark{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      color:#04111f;
-      display:grid;
-      place-items:center;
-      font-size:1.15rem;
-      box-shadow:0 12px 28px rgba(86,166,255,.35);
-      font-weight:900;
+    .nav {
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap:24px;
-      color:#d7e3ef;
-      font-size:.96rem;
+    .logo {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -.08em;
+      opacity: .95;
     }
 
-    .nav-links a{opacity:.88;transition:.2s}
-    .nav-links a:hover{opacity:1;color:#fff}
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border:none;
-      border-radius:999px;
-      padding:14px 22px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.22s ease;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 44px;
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,.8);
     }
 
-    .btn-primary{
-      color:#05111d;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow:0 14px 35px rgba(86,166,255,.28);
+    .nav-links a:hover { color: #fff; }
+
+    .hero {
+      position: relative;
+      min-height: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
     }
 
-    .btn-primary:hover{transform:translateY(-2px)}
-    .btn-ghost{
-      color:#eef5ff;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
+    .hero .content {
+      position: relative;
+      z-index: 1;
+      width: min(100% - 40px, 1120px);
+      margin: 0 auto;
+      padding: 80px 0 110px;
     }
 
-    .hero{
-      padding:92px 0 64px;
-      position:relative;
+    .mark {
+      margin: 0 auto 28px;
+      font-weight: 900;
+      font-size: 54px;
+      letter-spacing: -.12em;
+      line-height: .8;
+      text-shadow: 0 0 18px rgba(255,255,255,.18);
     }
 
-    .hero-wrap{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:32px;
-      align-items:center;
+    .mark small {
+      display: block;
+      font-size: 11px;
+      letter-spacing: .35em;
+      font-weight: 700;
+      margin-top: 10px;
+      opacity: .72;
     }
 
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:8px 14px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:999px;
-      color:#dce8f5;
-      font-size:.88rem;
-      margin-bottom:18px;
+    h1 {
+      margin: 0 auto;
+      max-width: 1100px;
+      font-size: clamp(44px, 6vw, 86px);
+      line-height: .96;
+      letter-spacing: -.07em;
+      font-weight: 900;
     }
 
-    .dot{
-      width:9px;height:9px;border-radius:50%;
-      background:#6fffa5;
-      box-shadow:0 0 18px #6fffa5;
+    .hero-sub {
+      max-width: 980px;
+      margin: 30px auto 24px;
+      font-size: clamp(20px, 2.1vw, 31px);
+      line-height: 1.35;
+      color: rgba(255,255,255,.82);
+      font-weight: 500;
     }
 
-    h1{
-      margin:0 0 16px;
-      font-size:clamp(2.6rem, 5vw, 5rem);
-      line-height:.96;
-      letter-spacing:-.05em;
-      max-width:720px;
+    .hero-mini {
+      max-width: 760px;
+      margin: 0 auto 42px;
+      font-size: 19px;
+      line-height: 1.45;
+      color: rgba(255,255,255,.66);
+      font-weight: 600;
     }
 
-    .lead{
-      max-width:640px;
-      color:var(--muted);
-      font-size:1.06rem;
-      line-height:1.75;
-      margin-bottom:28px;
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
     }
 
-    .hero-actions{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:28px;
+    .btn {
+      height: 76px;
+      padding: 0 34px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      font-size: 18px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
     }
 
-    .mini-stats{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-      max-width:620px;
+    .btn.primary {
+      background: #f2f2f3;
+      color: #111;
     }
 
-    .stat{
-      padding:18px;
-      border-radius:18px;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
+    .btn.secondary {
+      background: rgba(255,255,255,.12);
+      color: #fff;
     }
 
-    .stat strong{
-      display:block;
-      font-size:1.3rem;
-      margin-bottom:6px;
+    .check-row {
+      display: flex;
+      justify-content: center;
+      gap: 34px;
+      flex-wrap: wrap;
+      color: rgba(255,255,255,.72);
+      font-size: 17px;
+      font-weight: 500;
     }
 
-    .stat span{
-      color:var(--muted);
-      font-size:.92rem;
+    .check {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
     }
 
-    .hero-card{
-      position:relative;
-      border-radius:30px;
-      padding:22px;
-      background:
-        linear-gradient(180deg, rgba(14,24,37,.96), rgba(8,13,20,.96));
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+    .section {
+      position: relative;
+      padding: 110px 0;
     }
 
-    .hero-card::before{
-      content:"";
-      position:absolute;
-      inset:auto -25% -20% auto;
-      width:240px;height:240px;
-      background:radial-gradient(circle, rgba(86,166,255,.45), transparent 70%);
-      filter:blur(30px);
+    .section-title {
+      text-align: center;
+      margin-bottom: 60px;
     }
 
-    .dashboard{
-      display:grid;
-      gap:16px;
-      position:relative;
-      z-index:1;
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(38px, 4vw, 70px);
+      line-height: .96;
+      letter-spacing: -.07em;
+      font-weight: 900;
     }
 
-    .screen{
-      border-radius:22px;
-      padding:18px;
-      background:linear-gradient(180deg, #0a1119, #0c1520);
-      border:1px solid rgba(255,255,255,.06);
+    .section-title p {
+      max-width: 820px;
+      margin: 22px auto 0;
+      color: rgba(255,255,255,.8);
+      font-size: clamp(18px, 1.8vw, 28px);
+      line-height: 1.35;
+      font-weight: 500;
     }
 
-    .screen-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:18px;
-      color:#d8e6f3;
+    .tweets {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(250px, 1fr));
+      gap: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
     }
 
-    .badge{
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(86,166,255,.11);
-      color:#a9d3ff;
-      border:1px solid rgba(86,166,255,.2);
-      font-size:.82rem;
-      font-weight:700;
+    .tweet {
+      min-height: 310px;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(120,150,255,.15);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02), 0 0 0 1px rgba(28,70,160,.18);
     }
 
-    .chart{
-      height:220px;
-      border-radius:18px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)),
-        radial-gradient(circle at 15% 10%, rgba(86,166,255,.12), transparent 25%),
-        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size:auto, auto, 100% 42px, 42px 100%;
-      position:relative;
-      overflow:hidden;
+    .tweet-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .line{
-      position:absolute;
-      inset:0;
+    .tweet-user { display: flex; gap: 12px; }
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #2a3447, #141c28);
+      border: 1px solid rgba(255,255,255,.08);
+      display: grid;
+      place-items: center;
+      color: rgba(255,255,255,.72);
+      font-weight: 800;
     }
 
-    .line svg{width:100%;height:100%}
-    .cards-row{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
+    .tweet-name strong { display: block; font-size: 17px; }
+    .tweet-name span { color: rgba(255,255,255,.5); font-size: 14px; }
+    .tweet-body { font-size: 16px; line-height: 1.5; color: rgba(255,255,255,.92); min-height: 118px; }
+    .tweet-footer {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.09);
+      display: flex;
+      gap: 22px;
+      color: rgba(255,255,255,.45);
+      font-size: 15px;
     }
 
-    .mini{
-      border-radius:18px;
-      padding:16px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-    }
-    .mini b{display:block;margin-bottom:6px}
-    .mini p{margin:0;color:var(--muted);font-size:.9rem}
-
-    section.section{padding:34px 0}
-    .section-head{
-      display:flex;
-      justify-content:space-between;
-      gap:20px;
-      align-items:end;
-      margin-bottom:22px;
+    .showcase-card {
+      width: min(100%, 1100px);
+      margin: 0 auto;
+      background: linear-gradient(180deg, rgba(18,24,38,.96), rgba(10,15,24,.95));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: var(--shadow);
     }
 
-    .section-head h2{
-      margin:0 0 10px;
-      font-size:clamp(1.8rem, 3vw, 3rem);
-      letter-spacing:-.04em;
+    .image-box {
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #d8dbe6, #8e9ec4);
     }
 
-    .section-head p{
-      margin:0;
-      color:var(--muted);
-      max-width:620px;
-      line-height:1.7;
+    .showcase-caption {
+      text-align: center;
+      padding: 26px 26px 8px;
     }
 
-    .benefits{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
+    .showcase-caption h3 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 3vw, 44px);
+      letter-spacing: -.05em;
     }
 
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:24px;
-      padding:24px;
-      box-shadow:var(--shadow);
+    .showcase-caption p {
+      margin: 0;
+      font-size: clamp(18px, 1.6vw, 30px);
+      line-height: 1.45;
+      color: rgba(255,255,255,.82);
     }
 
-    .icon{
-      width:48px;height:48px;
-      display:grid;place-items:center;
-      border-radius:16px;
-      background:linear-gradient(135deg, rgba(86,166,255,.18), rgba(127,208,255,.08));
-      border:1px solid rgba(86,166,255,.18);
-      margin-bottom:16px;
-      color:#b9ddff;
-      font-weight:800;
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 34px;
+      width: min(100%, 1000px);
+      margin: 70px auto 0;
     }
 
-    .card h3{margin:0 0 10px;font-size:1.1rem}
-    .card p{margin:0;color:var(--muted);line-height:1.7}
-
-    .plans{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
+    .stat {
+      min-height: 250px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 26px;
+      box-shadow: var(--shadow);
     }
 
-    .plan{
-      position:relative;
-      padding:26px;
-      border-radius:26px;
-      border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      box-shadow:var(--shadow);
+    .stat-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      display: grid;
+      place-items: center;
+      margin-bottom: 26px;
+      font-size: 30px;
     }
 
-    .plan.featured{
-      transform:translateY(-10px);
-      background:
-        radial-gradient(circle at top, rgba(86,166,255,.16), transparent 45%),
-        linear-gradient(180deg, rgba(15,28,43,.98), rgba(9,16,25,.98));
-      border-color:rgba(127,208,255,.26);
+    .stat strong {
+      display: block;
+      font-size: clamp(34px, 3.2vw, 58px);
+      letter-spacing: -.06em;
+      margin-bottom: 10px;
     }
 
-    .plan .tag{
-      display:inline-block;
-      margin-bottom:14px;
-      padding:7px 11px;
-      border-radius:999px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);
-      color:#d9e9f7;
-      font-size:.84rem;
-      font-weight:700;
+    .stat span {
+      font-size: clamp(18px, 1.6vw, 28px);
+      color: rgba(255,255,255,.82);
+      font-weight: 500;
     }
 
-    .price{
-      display:flex;
-      align-items:end;
-      gap:8px;
-      margin:10px 0 14px;
+    .plans-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      align-items: stretch;
     }
 
-    .price strong{
-      font-size:2.4rem;
-      letter-spacing:-.05em;
+    .plan {
+      position: relative;
+      background: linear-gradient(180deg, rgba(18,24,38,.96), rgba(10,16,28,.95));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 26px;
+      padding: 34px 30px 28px;
+      box-shadow: var(--shadow);
     }
 
-    .price span{
-      color:var(--muted);
-      margin-bottom:8px;
+    .plan.featured {
+      background: linear-gradient(180deg, rgba(114,119,128,.92), rgba(82,88,101,.92));
+      color: #fff;
     }
 
-    .plan ul{
-      list-style:none;
-      padding:0;
-      margin:18px 0 22px;
-      display:grid;
-      gap:11px;
-      color:#d8e2ee;
+    .tag {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(47,124,246,.32);
     }
 
-    .plan li{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
+    .plan h3 {
+      margin: 6px 0 16px;
+      text-align: center;
+      font-size: clamp(34px, 2.8vw, 50px);
+      letter-spacing: -.06em;
     }
 
-    .plan li::before{
-      content:"✓";
-      color:#96d1ff;
-      font-weight:800;
+    .plan .sub {
+      text-align: center;
+      font-size: 18px;
+      color: rgba(255,255,255,.82);
+      margin-bottom: 28px;
     }
 
-    .showcase{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
+    .price-top, .price-main {
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: -.07em;
     }
 
-    .review{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
+    .price-top {
+      font-size: clamp(26px, 2vw, 36px);
+      color: rgba(255,255,255,.72);
+      margin-bottom: 6px;
     }
 
-    .avatar{
-      min-width:48px;width:48px;height:48px;border-radius:50%;
-      background:linear-gradient(135deg, #86c4ff, #4a79ff);
-      display:grid;place-items:center;
-      font-weight:800;
-      color:#07121e;
+    .price-main {
+      font-size: clamp(44px, 4vw, 72px);
+      margin-bottom: 28px;
     }
 
-    .review p{margin:0;color:var(--muted);line-height:1.75}
-    .review strong{display:block;margin-bottom:8px}
-
-    .faq{
-      display:grid;
-      gap:14px;
+    .plan h4 {
+      margin: 0 0 18px;
+      font-size: 18px;
     }
 
-    details{
-      border-radius:20px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.08);
-      padding:18px 20px;
+    .plan ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px;
+      display: grid;
+      gap: 16px;
     }
 
-    summary{
-      cursor:pointer;
-      font-weight:700;
-      list-style:none;
+    .plan li {
+      position: relative;
+      padding-left: 30px;
+      font-size: 17px;
+      line-height: 1.5;
+      color: rgba(255,255,255,.92);
     }
 
-    details p{
-      color:var(--muted);
-      line-height:1.7;
-      margin:14px 0 0;
+    .plan li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #fff;
+      font-weight: 900;
     }
 
-    .cta{
-      padding:20px;
-      border-radius:28px;
-      background:
-        radial-gradient(circle at top left, rgba(127,208,255,.16), transparent 30%),
-        linear-gradient(180deg, rgba(13,25,38,.96), rgba(10,16,24,.96));
-      border:1px solid rgba(255,255,255,.08);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px;
+    .featured li::before { color: #9fd0ff; }
+
+    .plan-btn {
+      height: 68px;
+      border-radius: 14px;
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.12);
+      color: #fff;
     }
 
-    footer{
-      padding:28px 0 50px;
-      color:#95a7ba;
-      font-size:.94rem;
+    .featured .plan-btn {
+      background: #f5f5f5;
+      color: #111;
     }
 
-    @media (max-width: 1040px){
-      .hero-wrap,
-      .showcase,
-      .benefits,
-      .plans{grid-template-columns:1fr}
-      .mini-stats,
-      .cards-row{grid-template-columns:1fr 1fr 1fr}
+    .twitter-btn {
+      background: linear-gradient(90deg, #a42fff, #7b20e0);
+      border-color: transparent;
     }
 
-    @media (max-width: 760px){
-      .nav{min-height:72px}
-      .nav-links{display:none}
-      .mini-stats,
-      .cards-row{grid-template-columns:1fr}
-      .cta,
-      .section-head{display:block}
-      .cta .hero-actions{margin-top:18px}
-      h1{font-size:2.6rem}
-      .hero{padding-top:56px}
+    @media (max-width: 1200px) {
+      .tweets { grid-template-columns: repeat(5, 280px); }
+      .plans-wrap { grid-template-columns: 1fr; max-width: 760px; }
+      .stats { grid-template-columns: 1fr; max-width: 520px; }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links { gap: 22px; font-size: 14px; }
+      .hero { min-height: 760px; }
+      .check-row { flex-direction: column; gap: 14px; align-items: center; }
+    }
+
+    @media (max-width: 640px) {
+      .nav { height: 74px; }
+      .nav-links { gap: 16px; font-size: 13px; }
+      .hero .content { padding-top: 44px; }
+      .btn { width: 100%; max-width: 340px; }
+      .hero-actions { align-items: center; }
+      .section { padding: 84px 0; }
+      .tweet { min-height: 280px; }
     }
   </style>
 </head>
 <body>
-  <div class="grid-glow"></div>
-
   <header>
     <div class="container nav">
-      <a class="brand" href="#">
-        <div class="brand-mark">W</div>
-        <div>
-          <div>Wave Tweaks</div>
-        </div>
-      </a>
-
+      <a href="#inicio" class="logo">WAE</a>
       <nav class="nav-links">
         <a href="#inicio">Início</a>
-        <a href="#beneficios">Benefícios</a>
         <a href="#planos">Planos</a>
-        <a href="#reviews">Resultados</a>
-        <a href="#faq">FAQ</a>
+        <a href="#twitter">Twitter ↗</a>
       </nav>
-
-      <a class="btn btn-primary" href="#planos">Começar agora</a>
     </div>
   </header>
 
-  <main>
-    <section class="hero" id="inicio">
-      <div class="container hero-wrap">
-        <div>
-          <div class="eyebrow"><span class="dot"></span> Otimização profissional para máximo desempenho</div>
-          <h1>Mais FPS, menos input delay e um PC muito mais leve.</h1>
-          <p class="lead">
-            Ajustes completos para deixar seu computador mais rápido, estável e pronto para extrair o máximo em jogos competitivos como Fortnite, Valorant e outros títulos.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#planos">Ver planos</a>
-            <a class="btn btn-ghost" href="#beneficios">Saiba mais</a>
-          </div>
-
-          <div class="mini-stats">
-            <div class="stat">
-              <strong>+FPS</strong>
-              <span>Configurações pensadas para desempenho real</span>
-            </div>
-            <div class="stat">
-              <strong>+Estável</strong>
-              <span>Menos travamentos e melhor resposta do sistema</span>
-            </div>
-            <div class="stat">
-              <strong>+Leve</strong>
-              <span>Otimização focada em fluidez e prioridade</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-card">
-          <div class="dashboard">
-            <div class="screen">
-              <div class="screen-top">
-                <strong>Painel de Desempenho</strong>
-                <span class="badge">Performance Mode</span>
-              </div>
-              <div class="chart">
-                <div class="line">
-                  <svg viewBox="0 0 600 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="strokeBlue" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#57A8FF"/>
-                        <stop offset="100%" stop-color="#88D4FF"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M0 170 C60 160, 80 120, 130 128 C180 136, 205 104, 250 110 C305 118, 340 82, 390 90 C440 98, 470 62, 530 56 C562 52, 584 44, 600 34"
-                          fill="none" stroke="url(#strokeBlue)" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M0 170 C60 160, 80 120, 130 128 C180 136, 205 104, 250 110 C305 118, 340 82, 390 90 C440 98, 470 62, 530 56 C562 52, 584 44, 600 34 L600 220 L0 220 Z"
-                          fill="rgba(86,166,255,.09)"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div class="cards-row">
-              <div class="mini">
-                <b>Input Delay</b>
-                <p>Resposta mais rápida e sensação mais limpa no jogo.</p>
-              </div>
-              <div class="mini">
-                <b>Windows Tweaks</b>
-                <p>Ajustes finos para reduzir peso e melhorar prioridade.</p>
-              </div>
-              <div class="mini">
-                <b>Game Focus</b>
-                <p>Setup focado em performance competitiva e estabilidade.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="beneficios">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <h2>Otimização pensada para quem quer jogar liso</h2>
-            <p>Uma estrutura visual forte, escura e profissional, inspirada no estilo do site que você mandou, já pronta para você trocar textos, valores e identidade.</p>
-          </div>
-        </div>
-
-        <div class="benefits">
-          <article class="card">
-            <div class="icon">01</div>
-            <h3>Mais desempenho no jogo</h3>
-            <p>Melhor organização do sistema para liberar recursos e entregar mais consistência durante partidas competitivas.</p>
-          </article>
-
-          <article class="card">
-            <div class="icon">02</div>
-            <h3>Menos processos desnecessários</h3>
-            <p>Estratégia focada em reduzir peso do Windows e remover o que atrapalha a experiência no dia a dia e em game.</p>
-          </article>
-
-          <article class="card">
-            <div class="icon">03</div>
-            <h3>Experiência mais responsiva</h3>
-            <p>Ajustes visuais e de prioridade para deixar o computador com sensação de uso mais leve, rápida e direta.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="planos">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <h2>Escolha o plano ideal</h2>
-            <p>Aqui você pode trocar preços, nomes e benefícios depois. A estrutura já ficou pronta para usar.</p>
-          </div>
-        </div>
-
-        <div class="plans">
-          <article class="plan">
-            <span class="tag">Starter</span>
-            <h3>Plano básico</h3>
-            <div class="price">
-              <strong>R$19</strong>
-              <span>/ único</span>
-            </div>
-            <ul>
-              <li>Otimização inicial do sistema</li>
-              <li>Ajustes básicos de desempenho</li>
-              <li>Foco em leveza e fluidez</li>
-              <li>Ideal para começar</li>
-            </ul>
-            <a class="btn btn-ghost" href="#">Escolher plano</a>
-          </article>
-
-          <article class="plan featured">
-            <span class="tag">Mais escolhido</span>
-            <h3>Plano Pro</h3>
-            <div class="price">
-              <strong>R$39</strong>
-              <span>/ mensal</span>
-            </div>
-            <ul>
-              <li>Otimização mais completa</li>
-              <li>Refino para jogos competitivos</li>
-              <li>Melhor equilíbrio entre FPS e estabilidade</li>
-              <li>Suporte para ajustes posteriores</li>
-            </ul>
-            <a class="btn btn-primary" href="#">Escolher plano</a>
-          </article>
-
-          <article class="plan">
-            <span class="tag">Elite</span>
-            <h3>Plano avançado</h3>
-            <div class="price">
-              <strong>R$79</strong>
-              <span>/ premium</span>
-            </div>
-            <ul>
-              <li>Pacote avançado de otimização</li>
-              <li>Ajustes mais refinados</li>
-              <li>Experiência visual e performance premium</li>
-              <li>Maior nível de personalização</li>
-            </ul>
-            <a class="btn btn-ghost" href="#">Escolher plano</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="reviews">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <h2>Visual de confiança e prova social</h2>
-            <p>Também deixei uma área pronta para resultados, feedbacks ou antes e depois, que combina com esse estilo de landing page.</p>
-          </div>
-        </div>
-
-        <div class="showcase">
-          <article class="card">
-            <div class="review">
-              <div class="avatar">G</div>
-              <div>
-                <strong>Gabriel</strong>
-                <p>Depois da otimização, o sistema ficou mais solto e o jogo muito mais liso. A estrutura desse site já passa um ar bem profissional.</p>
-              </div>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="review">
-              <div class="avatar">L</div>
-              <div>
-                <strong>Lucas</strong>
-                <p>O layout ficou forte, bonito e pronto para vender. É aquele estilo escuro e premium que chama atenção logo de cara.</p>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="faq">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <h2>Perguntas frequentes</h2>
-            <p>Essa área já fica pronta caso você queira deixar o site mais completo e profissional.</p>
-          </div>
-        </div>
-
-        <div class="faq">
-          <details open>
-            <summary>Esse site já está pronto para editar?</summary>
-            <p>Sim. Você pode trocar logo, textos, preços, cores, botões, seções e links sem precisar refazer toda a estrutura.</p>
-          </details>
-
-          <details>
-            <summary>Dá para colocar checkout, Discord ou formulário?</summary>
-            <p>Dá sim. A base permite adaptar botões para checkout, redirecionamento para Discord, WhatsApp, formulário ou página de pagamento.</p>
-          </details>
-
-          <details>
-            <summary>Consigo transformar isso em uma loja completa?</summary>
-            <p>Sim. Dá para expandir com páginas extras, área de planos, prova social, FAQ, checkout e até catálogo de serviços.</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="cta">
-          <div>
-            <h2 style="margin:0 0 8px;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-.04em;">Pronto para ajustar do seu jeito</h2>
-            <p style="margin:0;color:var(--muted);max-width:700px;line-height:1.7;">
-              Essa versão já entrega o visual premium e escuro no mesmo clima do site de referência. Agora é só trocar a identidade e os detalhes que você quiser.
-            </p>
-          </div>
-          <div class="hero-actions" style="margin:0">
-            <a class="btn btn-primary" href="#">Começar agora</a>
-            <a class="btn btn-ghost" href="#inicio">Voltar ao topo</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      © 2026 Wave Tweaks. Base visual inspirada em uma landing page de otimização de computador.
+  <section class="hero" id="inicio">
+    <div class="hero-bg" aria-hidden="true">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2.2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <g stroke="rgba(255,255,255,0.18)" stroke-width="1.2" fill="none" filter="url(#glow)">
+          <path d="M-20 80 C 180 20, 280 180, 430 120 S 720 40, 900 130 S 1240 240, 1620 80" />
+          <path d="M-40 130 C 180 70, 300 230, 470 170 S 760 80, 940 180 S 1260 290, 1640 130" />
+          <path d="M-30 180 C 180 120, 320 280, 500 220 S 800 130, 990 230 S 1280 330, 1640 180" />
+          <path d="M-20 230 C 170 170, 330 330, 520 270 S 820 180, 1010 280 S 1310 390, 1630 230" />
+          <path d="M-10 280 C 160 220, 340 380, 540 320 S 840 230, 1030 330 S 1330 450, 1620 280" />
+          <path d="M0 330 C 150 270, 350 430, 560 370 S 860 280, 1050 380 S 1340 500, 1610 330" />
+          <path d="M10 380 C 160 320, 360 480, 580 420 S 890 330, 1080 430 S 1360 550, 1600 380" />
+          <path d="M20 430 C 170 370, 380 530, 610 470 S 910 380, 1110 480 S 1380 600, 1590 430" />
+          <path d="M30 480 C 190 420, 400 580, 640 520 S 940 430, 1140 530 S 1410 650, 1580 480" />
+          <path d="M40 530 C 210 470, 430 630, 680 570 S 980 480, 1180 580 S 1430 700, 1570 530" />
+          <path d="M50 580 C 230 520, 460 680, 720 620 S 1020 530, 1210 630 S 1450 750, 1560 580" />
+          <path d="M60 630 C 250 570, 500 730, 760 670 S 1060 580, 1240 680 S 1470 800, 1550 630" />
+          <path d="M70 680 C 280 620, 540 780, 800 720 S 1090 630, 1270 730 S 1490 850, 1540 680" />
+          <path d="M80 730 C 320 670, 580 830, 850 770 S 1140 680, 1310 780 S 1510 890, 1530 730" />
+          <path d="M90 780 C 360 720, 620 870, 900 820 S 1190 720, 1360 830 S 1525 920, 1520 780" />
+          <path d="M120 -20 C 60 180, 190 260, 130 440 S 170 740, 90 940" />
+          <path d="M200 -20 C 140 180, 270 260, 210 440 S 250 740, 170 940" />
+          <path d="M280 -20 C 220 180, 350 260, 290 440 S 330 740, 250 940" />
+          <path d="M360 -20 C 300 180, 430 260, 370 440 S 410 740, 330 940" />
+          <path d="M440 -20 C 380 180, 510 260, 450 440 S 490 740, 410 940" />
+          <path d="M520 -20 C 460 180, 590 260, 530 440 S 570 740, 490 940" />
+          <path d="M600 -20 C 540 180, 670 260, 610 440 S 650 740, 570 940" />
+          <path d="M680 -20 C 620 180, 750 260, 690 440 S 730 740, 650 940" />
+          <path d="M760 -20 C 700 180, 830 260, 770 440 S 810 740, 730 940" />
+          <path d="M840 -20 C 780 180, 910 260, 850 440 S 890 740, 810 940" />
+          <path d="M920 -20 C 860 180, 990 260, 930 440 S 970 740, 890 940" />
+          <path d="M1000 -20 C 940 180, 1070 260, 1010 440 S 1050 740, 970 940" />
+          <path d="M1080 -20 C 1020 180, 1150 260, 1090 440 S 1130 740, 1050 940" />
+          <path d="M1160 -20 C 1100 180, 1230 260, 1170 440 S 1210 740, 1130 940" />
+          <path d="M1240 -20 C 1180 180, 1310 260, 1250 440 S 1290 740, 1210 940" />
+          <path d="M1320 -20 C 1260 180, 1390 260, 1330 440 S 1370 740, 1290 940" />
+          <path d="M1400 -20 C 1340 180, 1470 260, 1410 440 S 1450 740, 1370 940" />
+          <path d="M1480 -20 C 1420 180, 1550 260, 1490 440 S 1530 740, 1450 940" />
+        </g>
+      </svg>
     </div>
-  </footer>
+
+    <div class="content">
+      <div class="mark">WAE<small>TWEAKS</small></div>
+      <h1>Libere Todo o Potencial do Seu PC em Minutos</h1>
+      <div class="hero-sub">Uma travadinha. Um drop de FPS. E lá se foi o round. Com o Wave Tweaks, você otimiza tudo em minutos — sem frescura. Sem enrolação. Só performance.</div>
+      <div class="hero-mini">Usado por mais de 2000 jogadores profissionais que sabem: cada FPS importa.</div>
+      <div class="hero-actions">
+        <a class="btn primary" href="#planos">⌄ Baixar Agora &nbsp; ›</a>
+        <a class="btn secondary" href="#pros">Saiba Mais &nbsp; →</a>
+      </div>
+      <div class="check-row">
+        <span class="check">✓ Instalação rápida e fácil</span>
+        <span class="check">✓ Seguro e sem preocupações</span>
+        <span class="check">✓ Suporte disponível sempre que precisar</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pros">
+    <div class="container">
+      <div class="section-title">
+        <h2>Os pros usam e aprovam</h2>
+        <p>Independente do jogo, você vai ter mais performance e vai jogar melhor por conta disso</p>
+      </div>
+
+      <div class="tweets">
+        <article class="tweet">
+          <div class="tweet-head">
+            <div class="tweet-user">
+              <div class="avatar">F</div>
+              <div class="tweet-name"><strong>FAZER</strong><span>@fazern</span></div>
+            </div>
+            <span>•••</span>
+          </div>
+          <div class="tweet-body">best tweaker @wavetweaks 😍</div>
+          <div class="tweet-footer"><span>3</span><span>1</span><span>101</span><span>↗</span></div>
+        </article>
+
+        <article class="tweet">
+          <div class="tweet-head">
+            <div class="tweet-user">
+              <div class="avatar">N</div>
+              <div class="tweet-name"><strong>Night</strong><span>@nightfn</span></div>
+            </div>
+            <span>•••</span>
+          </div>
+          <div class="tweet-body">o goat das otimizações @wavetweaks deixou meu pc lisinho, bizarro</div>
+          <div class="tweet-footer"><span>1</span><span>2</span><span>38</span><span>↗</span></div>
+        </article>
+
+        <article class="tweet">
+          <div class="tweet-head">
+            <div class="tweet-user">
+              <div class="avatar">T</div>
+              <div class="tweet-name"><strong>Tecne</strong><span>@tecnefn</span></div>
+            </div>
+            <span>•••</span>
+          </div>
+          <div class="tweet-body">best tweaker @wavetweaks</div>
+          <div class="tweet-footer"><span>4</span><span>1</span><span>10</span><span>↗</span></div>
+        </article>
+
+        <article class="tweet">
+          <div class="tweet-head">
+            <div class="tweet-user">
+              <div class="avatar">P</div>
+              <div class="tweet-name"><strong>Pinécio</strong><span>@pineciokaiki</span></div>
+            </div>
+            <span>•••</span>
+          </div>
+          <div class="tweet-body">Já recomendei o mesmo para não sei quantas pessoas... e todas as vezes que peço o feedback, sempre falam bem, o cara paga por X e espera Y, o Wavé é muito bom no que faz...</div>
+          <div class="tweet-footer"><span>5</span><span>1</span><span>30</span><span>↗</span></div>
+        </article>
+
+        <article class="tweet">
+          <div class="tweet-head">
+            <div class="tweet-user">
+              <div class="avatar">F</div>
+              <div class="tweet-name"><strong>Feloz</strong><span>@TheFeloz</span></div>
+            </div>
+            <span>•••</span>
+          </div>
+          <div class="tweet-body">Depois de muito tempo com drops, finalmente fiz um BOOST brabo com @wavetweaks! Agora só falta stream e vai ficar top!</div>
+          <div class="tweet-footer"><span>3</span><span>1</span><span>12</span><span>↗</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Eles Usaram Wave Tweaks</h2>
+        <p>Isso não é um gasto, e sim um investimento.</p>
+      </div>
+
+      <div class="showcase-card">
+        <div class="image-box">
+          <img src="https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=1400&q=80" alt="resultado competitivo" />
+        </div>
+        <div class="showcase-caption">
+          <h3>Campeão com Wave Tweaks</h3>
+          <p>No competitivo, uma travadinha muda tudo: a mira sai, o timing erra, e aí você já sabe. Com o Wave Tweaks, você elimina as quedas de FPS e joga com a estabilidade que precisa pra decidir o jogo sem ser sabotado pelo seu PC.</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-icon">⌂</div>
+          <strong>2mil+</strong>
+          <span>PCs Otimizados</span>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">&lt;/&gt;</div>
+          <strong>100+</strong>
+          <span>Melhorias Implementadas</span>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">◷</div>
+          <strong>24/7</strong>
+          <span>Suporte Disponível</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="planos">
+    <div class="container">
+      <div class="section-title">
+        <h2>Escolha Seu Plano</h2>
+        <p>Selecione o plano ideal para maximizar o desempenho do seu computador</p>
+      </div>
+
+      <div class="plans-wrap">
+        <article class="plan">
+          <h3>Mensal</h3>
+          <div class="sub">Otimização completa por mês</div>
+          <div class="price-main">R$30,00<span style="font-size:.45em;font-weight:700">/mês</span></div>
+          <h4>Inclui:</h4>
+          <ul>
+            <li>Aumento significativo de FPS</li>
+            <li>Redução drástica da latência</li>
+            <li>Eliminação de travadas e stuttering</li>
+            <li>Maior estabilidade do sistema</li>
+            <li>Otimização completa do Windows</li>
+            <li>Suporte</li>
+          </ul>
+          <a href="#" class="plan-btn">Comprar Agora →</a>
+        </article>
+
+        <article class="plan featured">
+          <div class="tag">Melhor Custo-Benefício</div>
+          <h3>1 Ano</h3>
+          <div class="sub">Otimização completa por 1 ano</div>
+          <div class="price-top">R$10,42<span style="font-size:.6em;font-weight:700">/mês</span></div>
+          <div class="price-main">R$125,00<span style="font-size:.45em;font-weight:700">/ano</span></div>
+          <h4>Inclui:</h4>
+          <ul>
+            <li>Tudo do plano mensal</li>
+            <li>2 meses grátis inclusos</li>
+            <li>Prioridade máxima no suporte</li>
+            <li>Economia de R$235,00 no ano</li>
+          </ul>
+          <a href="#" class="plan-btn">Comprar Agora →</a>
+        </article>
+
+        <article class="plan">
+          <h3>Overclock Pro</h3>
+          <div class="sub">Serviço personalizado de overclock</div>
+          <div class="price-main">Consulte</div>
+          <h4>Inclui:</h4>
+          <ul>
+            <li>Análise completa do hardware</li>
+            <li>Overclock seguro de CPU/RAM/GPU</li>
+            <li>Teste de estabilidade profissional</li>
+            <li>Configuração de voltagem otimizada</li>
+            <li>Monitoramento de temperatura</li>
+            <li>Suporte técnico especializado</li>
+          </ul>
+          <a href="#twitter" class="plan-btn twitter-btn">Twitter Consultar no Twitter</a>
+        </article>
+      </div>
+    </div>
+  </section>
 </body>
 </html>
-'''
-
-path = Path("/mnt/data/wave-inspired.html")
-path.write_text(html, encoding="utf-8")
-print(f"Arquivo criado em: {path}")
